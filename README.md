@@ -30,6 +30,8 @@ Open `index.html` directly in a browser. The page and its fonts are self-contain
   Adjust `.portrait-frame img` → `object-position` in `style.css` to reposition
   the crop. The hero uses a square photograph in a paper-style album frame.
 - Colors are CSS variables at the top of `style.css`.
+- When changing `style.css` or `script.js`, update its `?v=` value in
+  `index.html` so returning visitors load the matching assets after deployment.
 - Update `cv.html` alongside homepage changes, then print it to PDF from a
   browser with A4 paper, background graphics enabled, and browser headers and
   footers disabled. Save the output as `cv.pdf`.

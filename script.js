@@ -182,9 +182,8 @@ function drawSignal(time) {
 
 function resizeCanvas() {
   if (!context) return;
-  const bounds = canvas.getBoundingClientRect();
-  canvasWidth = bounds.width;
-  canvasHeight = bounds.height;
+  canvasWidth = canvas.clientWidth;
+  canvasHeight = canvas.clientHeight;
   const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
   canvas.width = Math.round(canvasWidth * pixelRatio);
   canvas.height = Math.round(canvasHeight * pixelRatio);
