@@ -132,10 +132,10 @@ function drawSignal(time) {
     highlightedSignal = active;
     signalLabels.forEach((label, i) => label.classList.toggle('is-active', active === i || active === 3));
   }
-  const colors = [[110,145,199], [153,128,184], [177,130,161]];
+  const colors = [[167,138,190], [150,114,182], [181,140,171]];
   const origins = [40, 95, 150];
   // A faint sampling grid keeps the sketch connected to signal processing.
-  context.fillStyle = '#dfe5f1';
+  context.fillStyle = '#ebe1f0';
   for (let x = 135; x <= 320; x += 20) {
     for (let y = 30; y <= 160; y += 20) {
       context.beginPath(); context.arc(x, y, .8, 0, Math.PI * 2); context.fill();
@@ -163,7 +163,7 @@ function drawSignal(time) {
   });
 
   const glow = context.createRadialGradient(353, 95, 8, 353, 95, 44);
-  glow.addColorStop(0, '#d9ddf2'); glow.addColorStop(1, '#f8faff00');
+  glow.addColorStop(0, '#eadcf3'); glow.addColorStop(1, '#fffdfb00');
   context.fillStyle = glow;
   context.beginPath(); context.arc(353, 95, 44, 0, Math.PI * 2); context.fill();
   colors.forEach((rgb, i) => {
@@ -173,9 +173,9 @@ function drawSignal(time) {
     context.arc(353, 95, 29 + i * 4, time * .15 + i * 2.1, time * .15 + i * 2.1 + 1.55);
     context.stroke();
   });
-  context.fillStyle = '#e4e3f6'; context.strokeStyle = '#9395bd'; context.lineWidth = 1.4;
+  context.fillStyle = '#efe1f7'; context.strokeStyle = '#b297c5'; context.lineWidth = 1.4;
   context.beginPath(); context.arc(353, 95, 21, 0, Math.PI * 2); context.fill(); context.stroke();
-  context.strokeStyle = '#666f9e'; context.lineWidth = 2; context.lineCap = 'round';
+  context.strokeStyle = '#9270a6'; context.lineWidth = 2; context.lineCap = 'round';
   context.beginPath(); context.moveTo(345, 95); context.lineTo(361, 95); context.moveTo(353, 87); context.lineTo(353, 103); context.stroke();
   context.restore();
 }
