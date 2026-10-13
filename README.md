@@ -3,14 +3,9 @@
 A single-page research portfolio for GitHub Pages, written in HTML, CSS, and
 vanilla JavaScript. No build step or package installation is required.
 
-## Local preview
+## Preview
 
-```sh
-cd ~/profile
-python -m http.server 8000
-```
-
-Open `http://localhost:8000` in a browser.
+Open `index.html` directly in a browser. The page and its fonts are self-contained.
 
 ## Files
 
@@ -18,13 +13,14 @@ Open `http://localhost:8000` in a browser.
 | --- | --- |
 | `index.html` | Introduction, news, publications, experience, education, awards, contact |
 | `style.css` | Colors, typography, responsive layout, scroll transitions |
-| `script.js` | Signal animation, motion controls, mobile navigation, BibTeX disclosure |
+| `script.js` | Three-signal fusion animation, motion controls, mobile navigation, BibTeX disclosure |
 | `profile.jpg` | Original portrait supplied by Kyeong-Rae |
 | `images/floorsav.png`, `images/padd.png` | Figures from the existing project pages |
 | `images/social-preview.png` | Link-sharing preview image |
 | `cv.html` | Editable, printable CV source |
 | `cv.pdf` | Downloadable PDF generated from `cv.html` |
 | `assets/favicon.svg` | Site icon |
+| `assets/fonts/` | Self-hosted Manrope, DM Sans, and Caveat, with their OFL licenses |
 | `.nojekyll` | Serve these static files directly through GitHub Pages |
 
 ## Editing
@@ -32,7 +28,7 @@ Open `http://localhost:8000` in a browser.
 - Edit text, dates, publication links, and the PADD citation in `index.html`.
 - The portrait uses CSS `object-fit: cover` without changing the original image.
   Adjust `.portrait-frame img` → `object-position` in `style.css` to reposition
-  the crop. Desktop uses a 4:5 frame; mobile uses a square frame.
+  the crop. The hero uses a square photograph in a paper-style album frame.
 - Colors are CSS variables at the top of `style.css`.
 - Update `cv.html` alongside homepage changes, then print it to PDF from a
   browser with A4 paper, background graphics enabled, and browser headers and
@@ -63,6 +59,6 @@ Navigation supports keyboard focus and Escape to close the mobile menu.
 - FloorSAV figure: <https://byulharang.github.io/FloorSAV/assets/figures/framework.png>
 - PADD figure: embedded teaser from <https://byulharang.github.io/PADD/>
 - Portrait: supplied by Kyeong-Rae Kim.
-- Typefaces: Manrope and DM Sans through Google Fonts, with local system fallbacks.
-- The layout, procedural signal sculpture, and graphic identity are original
+- Typefaces: Manrope and DM Sans for the interface, with Caveat used sparingly for the personal introduction and photo notes. Fonts are self-hosted; licenses are in `assets/fonts/`.
+- The layout, procedural signal-fusion diagram, and graphic identity are original
   to this site. The reference portfolio informed the information structure.

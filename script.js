@@ -91,8 +91,8 @@ function updateScroll() {
   const progress = Math.min(1, window.scrollY / Math.max(hero.offsetHeight, 1));
   heroLayers.forEach((layer, index) => {
     const animate = !reducedMotion.matches && !motionPaused;
-    layer.style.transform = animate ? `translateY(${progress * (index ? 65 : 28)}px)` : '';
-    layer.style.opacity = animate ? String(Math.max(0.12, 1 - progress * 1.05)) : '';
+    layer.style.transform = animate && index ? `translateY(${progress * 12}px)` : '';
+    layer.style.opacity = '';
   });
   if (window.scrollY < 100) navigation.querySelectorAll('[aria-current]').forEach((link) => link.removeAttribute('aria-current'));
   scrollRequested = false;
@@ -105,7 +105,8 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 updateScroll();
 
-// A procedural signal sculpture: independent rings form one shared space.
+// Three sensory signals flow into a shared representation. The emphasis moves
+// gently between inputs before highlighting their combination.
 // The canvas is decorative; all content and navigation live in semantic HTML.
 const canvas = document.getElementById('signal-canvas');
 const context = canvas.getContext('2d');
@@ -114,77 +115,68 @@ let lastFrame = 0;
 let elapsed = 0;
 let canvasVisible = true;
 let canvasWidth = 500;
-let canvasHeight = 455;
-
-function project(x, y, z, time) {
-  const yaw = -.4 + time * .11;
-  const pitch = .82 + Math.sin(time * .15) * .08;
-  const rx = x * Math.cos(yaw) - z * Math.sin(yaw);
-  const rz = x * Math.sin(yaw) + z * Math.cos(yaw);
-  const ry = y * Math.cos(pitch) - rz * Math.sin(pitch);
-  const depth = y * Math.sin(pitch) + rz * Math.cos(pitch);
-  const perspective = 560 / (560 + depth);
-  return { x: rx * perspective, y: ry * perspective, depth };
-}
+let canvasHeight = 190;
+let highlightedSignal = -1;
+const signalLabels = [...document.querySelectorAll('.signal-label')];
 
 function drawSignal(time) {
   if (!context) return;
-  const scale = Math.min(canvasWidth / 500, canvasHeight / 430);
+  const scale = Math.min(canvasWidth / 500, canvasHeight / 190);
   context.clearRect(0, 0, canvasWidth, canvasHeight);
   context.save();
-  context.translate(canvasWidth / 2, canvasHeight / 2);
+  context.translate((canvasWidth - 500 * scale) / 2, (canvasHeight - 190 * scale) / 2);
   context.scale(scale, scale);
 
-  // Light coordinate axes behind the ring structure.
-  context.lineWidth = .6;
-  context.strokeStyle = '#cdd4c3';
-  context.setLineDash([3, 6]);
-  [[-204, 78, 205, -78], [-155, -120, 155, 120], [0, -176, 0, 178]].forEach((axis) => {
-    context.beginPath(); context.moveTo(axis[0], axis[1]); context.lineTo(axis[2], axis[3]); context.stroke();
-  });
-  context.setLineDash([]);
-
-  const curves = [];
-  for (let ring = 0; ring < 36; ring++) {
-    const u = ring / 36 * Math.PI * 2;
-    const points = [];
-    let averageDepth = 0;
-    for (let step = 0; step <= 80; step++) {
-      const v = step / 80 * Math.PI * 2;
-      const tube = 50 + Math.sin(u * 3 + time * .3) * 7;
-      const radius = 111 + tube * Math.cos(v);
-      const p = project(radius * Math.cos(u), tube * Math.sin(v), radius * Math.sin(u), time);
-      points.push(p);
-      averageDepth += p.depth;
-    }
-    curves.push({ points, depth: averageDepth / points.length, ring });
+  const active = Math.floor(time / 3) % 4;
+  if (active !== highlightedSignal) {
+    highlightedSignal = active;
+    signalLabels.forEach((label, i) => label.classList.toggle('is-active', active === i || active === 3));
   }
-  curves.sort((a, b) => b.depth - a.depth);
-  curves.forEach(({ points, depth, ring }) => {
-    const alpha = .25 + (1 - (depth + 170) / 340) * .55;
-    context.strokeStyle = ring % 9 === 0 ? `rgba(105,145,48,${alpha})` : `rgba(47,67,47,${alpha})`;
-    context.lineWidth = ring % 9 === 0 ? 1.3 : .7;
-    context.beginPath();
-    points.forEach((p, index) => index ? context.lineTo(p.x, p.y) : context.moveTo(p.x, p.y));
-    context.stroke();
-    if (ring % 3 === 0) {
-      for (let j = 0; j < points.length; j += 8) {
-        context.fillStyle = `rgba(54,74,45,${alpha})`;
-        context.beginPath(); context.arc(points[j].x, points[j].y, 1.2, 0, Math.PI * 2); context.fill();
-      }
+  const colors = [[110,145,199], [153,128,184], [177,130,161]];
+  const origins = [40, 95, 150];
+  // A faint sampling grid keeps the sketch connected to signal processing.
+  context.fillStyle = '#dfe5f1';
+  for (let x = 135; x <= 320; x += 20) {
+    for (let y = 30; y <= 160; y += 20) {
+      context.beginPath(); context.arc(x, y, .8, 0, Math.PI * 2); context.fill();
     }
+  }
+  function point(channel, u) {
+    const ease = u * u * (3 - 2 * u);
+    const envelope = Math.sin(Math.PI * u) * (1 - u * .65);
+    const wave = channel === 0 ? Math.sin(u * 14 - time * 1.2) : channel === 1 ? Math.sin(u * 35 - time * 2.4) : Math.pow(Math.sin(u * 17 - time * 1.7), 5);
+    return { x: 119 + u * 212, y: origins[channel] + (95 - origins[channel]) * ease + wave * envelope * (channel === 1 ? 19 : 13) };
+  }
+  colors.forEach((rgb, channel) => {
+    const emphasis = active === channel || active === 3;
+    context.strokeStyle = `rgba(${rgb.join(',')},${emphasis ? 1 : .67})`;
+    context.lineWidth = emphasis ? 2.6 : 1.8;
+    context.beginPath();
+    for (let j = 0; j <= 100; j++) {
+      const p = point(channel, j / 100);
+      if (j) context.lineTo(p.x, p.y); else context.moveTo(p.x, p.y);
+    }
+    context.stroke();
+    const p = point(channel, (time * .28 + channel * .27) % 1);
+    context.fillStyle = `rgb(${rgb.join(',')})`;
+    context.beginPath(); context.arc(p.x, p.y, emphasis ? 3.7 : 2.5, 0, Math.PI * 2); context.fill();
   });
 
-  const center = project(0, 0, 0, time);
-  const glow = context.createRadialGradient(center.x - 7, center.y - 8, 0, center.x, center.y, 29);
-  glow.addColorStop(0, '#edffb2'); glow.addColorStop(.7, '#d5f86a'); glow.addColorStop(1, '#bed856');
+  const glow = context.createRadialGradient(353, 95, 8, 353, 95, 44);
+  glow.addColorStop(0, '#d9ddf2'); glow.addColorStop(1, '#f8faff00');
   context.fillStyle = glow;
-  context.beginPath(); context.arc(center.x, center.y, 27, 0, Math.PI * 2); context.fill();
-  const satellite = project(Math.cos(time * .23 + .8) * 170, 28, Math.sin(time * .23 + .8) * 170, time);
-  context.strokeStyle = 'rgba(180,125,72,.35)'; context.lineWidth = .7;
-  context.beginPath(); context.moveTo(center.x, center.y); context.lineTo(satellite.x, satellite.y); context.stroke();
-  context.fillStyle = '#e49158'; context.beginPath(); context.arc(satellite.x, satellite.y, 5, 0, Math.PI * 2); context.fill();
-  context.strokeStyle = '#e4915850'; context.beginPath(); context.arc(satellite.x, satellite.y, 11, 0, Math.PI * 2); context.stroke();
+  context.beginPath(); context.arc(353, 95, 44, 0, Math.PI * 2); context.fill();
+  colors.forEach((rgb, i) => {
+    context.strokeStyle = `rgba(${rgb.join(',')},${active === 3 ? .85 : .5})`;
+    context.lineWidth = 1.7;
+    context.beginPath();
+    context.arc(353, 95, 29 + i * 4, time * .15 + i * 2.1, time * .15 + i * 2.1 + 1.55);
+    context.stroke();
+  });
+  context.fillStyle = '#e4e3f6'; context.strokeStyle = '#9395bd'; context.lineWidth = 1.4;
+  context.beginPath(); context.arc(353, 95, 21, 0, Math.PI * 2); context.fill(); context.stroke();
+  context.strokeStyle = '#666f9e'; context.lineWidth = 2; context.lineCap = 'round';
+  context.beginPath(); context.moveTo(345, 95); context.lineTo(361, 95); context.moveTo(353, 87); context.lineTo(353, 103); context.stroke();
   context.restore();
 }
 
